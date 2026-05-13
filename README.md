@@ -8,17 +8,30 @@ Full-stack expense tracker with Google/GitHub OAuth, real-time budget alerts via
 
 ## Setup
 
-### Quick start (Makefile)
+### Docker (recommended)
+
+```bash
+make prod-build   # build images and start — app available at http://localhost
+make prod-down    # stop and remove containers
+```
+
+SQLite data is persisted in a Docker named volume (`db_data`). Override secrets by creating a `.env` file in the repo root before running (see [Environment Variables](#environment-variables-backendenv) below).
+
+### Local dev (Makefile)
 
 ```bash
 make deps       # npm install for both backend and frontend
 make migrate    # run pending DB migrations
 make seed       # seed demo data + create local admin user
+make local      # start backend (port 3001) + frontend (port 5173) in parallel
+```
+
+Or start servers individually in separate terminals:
+
+```bash
 make dev-be     # backend dev server on http://localhost:3001
 make dev-fe     # frontend dev server on http://localhost:5173
 ```
-
-Run both servers in separate terminals. The frontend proxies API calls to the backend via `VITE_API_URL`.
 
 ### Manual setup
 
@@ -47,6 +60,43 @@ LOCAL_USERS=admin:password
 ```
 
 Run `make seed` once to pre-create the admin row in the database. The login page will show a "Use local credentials" toggle automatically.
+
+---
+
+## Docker
+
+### Architecture
+
+```
+Browser → nginx (:80)
+            ├── /api/*   → backend:3001
+            ├── /auth/*  → backend:3001
+            ├── WS upgrade → backend:3001
+            └── everything else → React SPA (static files)
+```
+
+`nginx` handles TLS termination, static file serving, and proxies all API/WebSocket traffic to the Node backend. The frontend is built with `VITE_API_URL=""` so all fetch calls use relative paths through nginx — no CORS involved.
+
+### Make commands
+
+| Command | Description |
+|---------|-------------|
+| `make prod-build` | Build images and start all services in the background |
+| `make prod` | Start existing images (no rebuild) |
+| `make prod-down` | Stop and remove containers |
+
+### Configuration
+
+Create a `.env` file in the repo root to override defaults:
+
+```env
+SESSION_SECRET=your_long_random_secret
+FRONTEND_URL=https://your-domain.com
+LOCAL_AUTH_ENABLED=true
+LOCAL_USERS=admin:password
+```
+
+For OAuth in production, add the Google/GitHub credentials and set the callback URLs to your deployed domain (e.g. `https://your-domain.com/auth/google/callback`).
 
 ---
 
@@ -167,7 +217,7 @@ On success the user is redirected to the frontend root. On failure they are redi
 
 ## WebSocket
 
-Connect to `ws://localhost:3001` after authentication.
+Connect to `ws://localhost:3001` (local dev) or `ws://your-host` (Docker/nginx) after authentication.
 
 **Client → Server:**
 ```json

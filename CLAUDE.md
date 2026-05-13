@@ -8,6 +8,7 @@ All common operations are in the root `Makefile`:
 
 ```bash
 make deps          # npm install for both backend and frontend
+make local         # start backend + frontend dev servers in parallel
 make dev-be        # backend dev server (ts-node, port 3001)
 make dev-fe        # frontend dev server (Vite, port 5173)
 make build         # tsc + vite build
@@ -16,6 +17,9 @@ make test          # backend Jest tests (only backend has tests)
 make migrate       # run pending DB migrations
 make revert        # revert the last migration
 make seed          # seed demo data + local admin user
+make prod-build    # docker compose up -d --build (rebuild images)
+make prod          # docker compose up -d (start existing images)
+make prod-down     # docker compose down
 ```
 
 Run a single backend test file:
@@ -77,4 +81,4 @@ Backend `.env` (see `.env.example`):
 | `DB_PATH` | Defaults to `./data/expense_tracker.db` |
 | `FRONTEND_URL` | Used for CORS and OAuth redirect |
 
-Frontend has a single env var: `VITE_API_URL` (defaults to `http://localhost:3001`).
+Frontend has a single env var: `VITE_API_URL` (defaults to `http://localhost:3001`). In the Docker build it is set to `""` so all API/WS calls use relative paths through nginx.
