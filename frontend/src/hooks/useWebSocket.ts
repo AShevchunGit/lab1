@@ -1,6 +1,14 @@
 import { useEffect, useRef } from 'react';
 
-const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/^http/, 'ws');
+// When VITE_API_URL is empty (same-origin behind nginx), derive WS URL from window.location.
+const WS_URL = (() => {
+  const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+  if (!apiUrl) {
+    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${proto}//${window.location.host}`;
+  }
+  return apiUrl.replace(/^http/, 'ws');
+})();
 
 export interface WsMessage {
   type: string;

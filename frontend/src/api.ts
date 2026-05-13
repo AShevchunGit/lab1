@@ -1,4 +1,5 @@
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// Empty string means same-origin (behind a reverse proxy). ?? preserves '' unlike ||.
+const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
 
 export interface User {
   id: number;
