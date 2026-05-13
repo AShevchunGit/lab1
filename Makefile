@@ -1,4 +1,5 @@
-.PHONY: deps deps-be deps-fe dev-be dev-fe start-be start-fe build lint lint-be lint-fe test migrate revert seed
+.PHONY: deps deps-be deps-fe dev-be dev-fe start-be start-fe build lint lint-be lint-fe test migrate revert seed \
+        prod prod-build prod-down local
 
 # Install all dependencies
 deps: deps-be deps-fe
@@ -50,3 +51,17 @@ revert:
 
 seed:
 	cd backend && npm run seed
+
+# Docker / production
+prod:
+	docker compose up -d
+
+prod-build:
+	docker compose up -d --build
+
+prod-down:
+	docker compose down
+
+# Local dev (backend + frontend in parallel)
+local:
+	make -j2 dev-be dev-fe
