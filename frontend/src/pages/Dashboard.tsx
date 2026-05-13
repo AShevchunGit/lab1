@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { api, BudgetSummary } from '../api';
+import { api, BudgetSummary, Transaction } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { useWebSocket, WsMessage } from '../hooks/useWebSocket';
 import { useToast } from '../components/ToastProvider';
@@ -9,6 +9,7 @@ import { Modal } from '../components/Modal';
 import Button from '../components/Button';
 import Spinner from '../components/Spinner';
 import { ErrorBanner } from '../components/ErrorBanner';
+import { SpendingCharts } from '../components/SpendingCharts';
 
 const Page = styled.div`min-height: 100vh; background: ${({ theme }) => theme.colors.background};`;
 
@@ -84,6 +85,7 @@ export default function Dashboard() {
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [summary, setSummary] = useState<BudgetSummary | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showBudgetModal, setShowBudgetModal] = useState(false);
@@ -92,7 +94,18 @@ export default function Dashboard() {
 
   const loadSummary = useCallback(async () => {
     setLoading(true); setError('');
-    try { setSummary(await api.getBudget(year, month)); }
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const dateFrom = `${year}-${pad(month)}-01`;
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const dateTo = `${year}-${pad(month)}-${pad(daysInMonth)}`;
+    try {
+      const [budgetData, txData] = await Promise.all([
+        api.getBudget(year, month),
+        api.getTransactions({ date_from: dateFrom, date_to: dateTo }),
+      ]);
+      setSummary(budgetData);
+      setTransactions(txData);
+    }
     catch (e) { setError((e as Error).message); }
     finally { setLoading(false); }
   }, [year, month]);
@@ -153,31 +166,34 @@ export default function Dashboard() {
         <ErrorBanner message={error} onDismiss={() => setError('')} />
 
         {loading ? <Spinner center /> : (
-          <SummaryCard>
-            <CardTitle>Budget Summary</CardTitle>
-            <StatsGrid>
-              <Stat><StatLabel>Income</StatLabel><StatValue color="#10B981">+${(summary?.income ?? 0).toFixed(2)}</StatValue></Stat>
-              <Stat><StatLabel>Expenses</StatLabel><StatValue color="#EF4444">-${(summary?.spent ?? 0).toFixed(2)}</StatValue></Stat>
-              <Stat><StatLabel>Net</StatLabel><StatValue color={(summary?.net ?? 0) >= 0 ? '#10B981' : '#EF4444'}>{(summary?.net ?? 0) >= 0 ? '+' : ''}${(summary?.net ?? 0).toFixed(2)}</StatValue></Stat>
-            </StatsGrid>
-            {summary?.budget == null ? (
-              <NoBudget>
-                <p>No expense budget set for this month.</p>
-                <br />
-                <Button size="sm" onClick={() => setShowBudgetModal(true)}>Set a Budget</Button>
-              </NoBudget>
-            ) : (
-              <>
-                <StatsGrid>
-                  <Stat><StatLabel>Budget</StatLabel><StatValue>${summary.budget.toFixed(2)}</StatValue></Stat>
-                  <Stat><StatLabel>Spent</StatLabel><StatValue color={(summary.usagePct ?? 0) >= 100 ? '#EF4444' : '#111827'}>${summary.spent.toFixed(2)}</StatValue></Stat>
-                  <Stat><StatLabel>Remaining</StatLabel><StatValue color={(summary.remaining ?? 0) < 0 ? '#EF4444' : '#10B981'}>${(summary.remaining ?? 0).toFixed(2)}</StatValue></Stat>
-                </StatsGrid>
-                <ProgressBar><ProgressFill pct={summary.usagePct ?? 0} /></ProgressBar>
-                <ProgressLabel>{summary.usagePct?.toFixed(1)}% of budget used</ProgressLabel>
-              </>
-            )}
-          </SummaryCard>
+          <>
+            <SummaryCard>
+              <CardTitle>Budget Summary</CardTitle>
+              <StatsGrid>
+                <Stat><StatLabel>Income</StatLabel><StatValue color="#10B981">+${(summary?.income ?? 0).toFixed(2)}</StatValue></Stat>
+                <Stat><StatLabel>Expenses</StatLabel><StatValue color="#EF4444">-${(summary?.spent ?? 0).toFixed(2)}</StatValue></Stat>
+                <Stat><StatLabel>Net</StatLabel><StatValue color={(summary?.net ?? 0) >= 0 ? '#10B981' : '#EF4444'}>{(summary?.net ?? 0) >= 0 ? '+' : ''}${(summary?.net ?? 0).toFixed(2)}</StatValue></Stat>
+              </StatsGrid>
+              {summary?.budget == null ? (
+                <NoBudget>
+                  <p>No expense budget set for this month.</p>
+                  <br />
+                  <Button size="sm" onClick={() => setShowBudgetModal(true)}>Set a Budget</Button>
+                </NoBudget>
+              ) : (
+                <>
+                  <StatsGrid>
+                    <Stat><StatLabel>Budget</StatLabel><StatValue>${summary.budget.toFixed(2)}</StatValue></Stat>
+                    <Stat><StatLabel>Spent</StatLabel><StatValue color={(summary.usagePct ?? 0) >= 100 ? '#EF4444' : '#111827'}>${summary.spent.toFixed(2)}</StatValue></Stat>
+                    <Stat><StatLabel>Remaining</StatLabel><StatValue color={(summary.remaining ?? 0) < 0 ? '#EF4444' : '#10B981'}>${(summary.remaining ?? 0).toFixed(2)}</StatValue></Stat>
+                  </StatsGrid>
+                  <ProgressBar><ProgressFill pct={summary.usagePct ?? 0} /></ProgressBar>
+                  <ProgressLabel>{summary.usagePct?.toFixed(1)}% of budget used</ProgressLabel>
+                </>
+              )}
+            </SummaryCard>
+            <SpendingCharts transactions={transactions} month={month} year={year} />
+          </>
         )}
       </Content>
 
