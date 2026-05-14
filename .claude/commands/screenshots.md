@@ -6,7 +6,7 @@ The script will:
 1. Run pending DB migrations
 2. Seed demo data
 3. Start the backend (port 3001) and frontend (port 5173) dev servers
-4. Capture: login, google_oauth (if GOOGLE_CLIENT_ID is set), dashboard, charts, transactions, categories
+4. Capture: login, google_oauth (if GOOGLE_CLIENT_ID is set), github_oauth (if GITHUB_CLIENT_ID is set), dashboard, charts, transactions, categories
 5. Save PNGs to docs/screenshots/
 6. Kill both servers when done
 

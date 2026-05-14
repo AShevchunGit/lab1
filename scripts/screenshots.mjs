@@ -69,22 +69,27 @@ async function main() {
     await page.screenshot({ path: path.join(OUT, 'login.png') });
     console.log('✓ login.png');
 
-    // Google OAuth redirect — opens in a separate page, skipped if not configured
-    try {
-      const res = await fetch(`${BE}/auth/google`, { redirect: 'manual' });
-      if (res.status === 302) {
-        const gPage = await browser.newPage();
-        await gPage.setViewport({ width: 1280, height: 800 });
-        await gPage.goto(`${BE}/auth/google`, { waitUntil: 'domcontentloaded', timeout: 15000 });
-        await sleep(1500);
-        await gPage.screenshot({ path: path.join(OUT, 'google_oauth.png') });
-        await gPage.close();
-        console.log('✓ google_oauth.png');
-      } else {
-        console.log('⚠ google_oauth.png skipped — GOOGLE_CLIENT_ID not configured');
+    // OAuth provider screenshots — each opens in a separate page, skipped if not configured
+    for (const { name, path: authPath } of [
+      { name: 'google_oauth', path: '/auth/google' },
+      { name: 'github_oauth', path: '/auth/github' },
+    ]) {
+      try {
+        const res = await fetch(`${BE}${authPath}`, { redirect: 'manual' });
+        if (res.status === 302) {
+          const oPage = await browser.newPage();
+          await oPage.setViewport({ width: 1280, height: 800 });
+          await oPage.goto(`${BE}${authPath}`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+          await sleep(1500);
+          await oPage.screenshot({ path: path.join(OUT, `${name}.png`) });
+          await oPage.close();
+          console.log(`✓ ${name}.png`);
+        } else {
+          console.log(`⚠ ${name}.png skipped — provider not configured`);
+        }
+      } catch (e) {
+        console.log(`⚠ ${name}.png skipped —`, e.message);
       }
-    } catch (e) {
-      console.log('⚠ google_oauth.png skipped —', e.message);
     }
 
     // Log in with local credentials

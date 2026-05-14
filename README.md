@@ -8,9 +8,9 @@ Full-stack expense tracker with Google/GitHub OAuth, real-time budget alerts via
 
 ## Screenshots
 
-| Login | Google OAuth |
-|-------|--------------|
-| ![Login](docs/screenshots/login.png) | ![Google OAuth](docs/screenshots/google_oauth.png) |
+| Login | Google OAuth | GitHub OAuth |
+|-------|--------------|--------------|
+| ![Login](docs/screenshots/login.png) | ![Google OAuth](docs/screenshots/google_oauth.png) | ![GitHub OAuth](docs/screenshots/github_oauth.png) |
 
 | Dashboard | Charts |
 |-----------|--------|
@@ -21,7 +21,7 @@ Full-stack expense tracker with Google/GitHub OAuth, real-time budget alerts via
 | ![Transactions](docs/screenshots/transactions.png) | ![Categories](docs/screenshots/categories.png) |
 
 > Run `make screenshots` to regenerate (starts the dev servers, seeds data, captures with Puppeteer).
-> `google_oauth.png` is only captured when `GOOGLE_CLIENT_ID` is set in `backend/.env`.
+> `google_oauth.png` / `github_oauth.png` are only captured when the respective client ID is set in `backend/.env`.
 
 ---
 
