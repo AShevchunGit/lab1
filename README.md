@@ -8,9 +8,9 @@ Full-stack expense tracker with Google/GitHub OAuth, real-time budget alerts via
 
 ## Screenshots
 
-| Login | Google OAuth | GitHub OAuth |
-|-------|--------------|--------------|
-| ![Login](docs/screenshots/login.png) | ![Google OAuth](docs/screenshots/google_oauth.png) | ![GitHub OAuth](docs/screenshots/github_oauth.png) |
+| Login | Google OAuth | GitHub OAuth | GitHub Consent |
+|-------|--------------|--------------|----------------|
+| ![Login](docs/screenshots/login.png) | ![Google OAuth](docs/screenshots/google_oauth.png) | ![GitHub OAuth](docs/screenshots/github_oauth.png) | ![GitHub Consent](docs/screenshots/github-permissions.png) |
 
 | Dashboard | Charts |
 |-----------|--------|
