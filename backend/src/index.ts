@@ -10,6 +10,7 @@ import { WebSocketServer } from 'ws';
 import type Database from 'better-sqlite3';
 import { createDb } from './db/connection';
 import { initSchema } from './db/schema';
+import { migrateUp } from './db/migrate';
 import { createAuthRouter } from './routes/auth';
 import { createCategoriesRouter } from './routes/categories';
 import { createTransactionsRouter } from './routes/transactions';
@@ -19,6 +20,7 @@ import { errorHandler } from './middleware/error';
 
 const db: Database.Database = createDb();
 initSchema(db);
+migrateUp(db);
 
 const app = express();
 
