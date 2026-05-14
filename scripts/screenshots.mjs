@@ -69,16 +69,40 @@ async function main() {
     await page.screenshot({ path: path.join(OUT, 'login.png') });
     console.log('✓ login.png');
 
+    // Google OAuth redirect — opens in a separate page, skipped if not configured
+    try {
+      const res = await fetch(`${BE}/auth/google`, { redirect: 'manual' });
+      if (res.status === 302) {
+        const gPage = await browser.newPage();
+        await gPage.setViewport({ width: 1280, height: 800 });
+        await gPage.goto(`${BE}/auth/google`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await sleep(1500);
+        await gPage.screenshot({ path: path.join(OUT, 'google_oauth.png') });
+        await gPage.close();
+        console.log('✓ google_oauth.png');
+      } else {
+        console.log('⚠ google_oauth.png skipped — GOOGLE_CLIENT_ID not configured');
+      }
+    } catch (e) {
+      console.log('⚠ google_oauth.png skipped —', e.message);
+    }
+
     // Log in with local credentials
     await page.type('input[placeholder="Username"]', 'admin');
     await page.type('input[placeholder="Password"]', 'password');
     await page.click('button[type="submit"]');
     await page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 });
 
-    // Dashboard
+    // Dashboard (full page — shows budget summary)
     await sleep(500);
     await page.screenshot({ path: path.join(OUT, 'dashboard.png') });
     console.log('✓ dashboard.png');
+
+    // Charts — scroll down to the charts section on the dashboard
+    await page.evaluate(() => window.scrollBy(0, 420));
+    await sleep(300);
+    await page.screenshot({ path: path.join(OUT, 'charts.png') });
+    console.log('✓ charts.png');
 
     // Transactions
     await page.goto(`${FE}/transactions`, { waitUntil: 'domcontentloaded' });
