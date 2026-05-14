@@ -4,7 +4,9 @@
 
 **Stack:** Node.js · React · Styled Components · SQLite
 
- 
+| GitHub OAuth | GitHub Consent |
+|--------------|----------------|
+| ![GitHub OAuth](docs/screenshots/github_oauth.png) | ![GitHub Consent](docs/screenshots/github-permissions.png) |
 
 ---
 
