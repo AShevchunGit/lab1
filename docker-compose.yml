@@ -1,17 +1,9 @@
 services:
   backend:
     build: ./backend
+    env_file: ./backend/.env
     environment:
-      PORT: "3001"
-      SESSION_SECRET: ${SESSION_SECRET:-changeme_use_a_long_random_string_in_prod}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
       DB_PATH: /app/data/expense_tracker.db
-      LOCAL_AUTH_ENABLED: ${LOCAL_AUTH_ENABLED:-true}
-      LOCAL_USERS: ${LOCAL_USERS:-admin:password}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
-      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
-      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
     volumes:
       - db_data:/app/data
     restart: unless-stopped
