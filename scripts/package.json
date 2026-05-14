@@ -1,0 +1,8 @@
+{
+  "name": "task1-scripts",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "puppeteer": "^22.0.0"
+  }
+}

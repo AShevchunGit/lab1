@@ -1,14 +1,17 @@
-.PHONY: deps deps-be deps-fe dev-be dev-fe start-be start-fe build lint lint-be lint-fe test migrate revert seed seed-prod \
-        prod prod-build prod-down local
+.PHONY: deps deps-be deps-fe deps-scripts dev-be dev-fe start-be start-fe build lint lint-be lint-fe test migrate revert \
+        seed seed-prod screenshots prod prod-build prod-down local
 
 # Install all dependencies
-deps: deps-be deps-fe
+deps: deps-be deps-fe deps-scripts
 
 deps-be:
 	cd backend && npm install
 
 deps-fe:
 	cd frontend && npm install
+
+deps-scripts:
+	cd scripts && npm install
 
 # Development servers
 dev-be:
@@ -56,6 +59,10 @@ seed:
 #   docker compose exec backend node dist/db/seed.js
 seed-prod:
 	docker compose exec backend node dist/db/seed.js
+
+# Capture screenshots of all pages (requires make deps first)
+screenshots:
+	cd scripts && node screenshots.mjs
 
 # Docker / production
 prod:

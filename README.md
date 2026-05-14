@@ -6,6 +6,20 @@ Full-stack expense tracker with Google/GitHub OAuth, real-time budget alerts via
 
 ---
 
+## Screenshots
+
+| Login | Dashboard |
+|-------|-----------|
+| ![Login](docs/screenshots/login.png) | ![Dashboard](docs/screenshots/dashboard.png) |
+
+| Transactions | Categories |
+|--------------|------------|
+| ![Transactions](docs/screenshots/transactions.png) | ![Categories](docs/screenshots/categories.png) |
+
+> Run `make screenshots` to regenerate (starts the dev servers, seeds data, captures with Puppeteer).
+
+---
+
 ## Setup
 
 ### Docker (recommended)

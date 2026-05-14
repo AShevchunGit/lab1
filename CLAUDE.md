@@ -18,6 +18,7 @@ make migrate       # run pending DB migrations
 make revert        # revert the last migration
 make seed          # seed demo data + local admin user (local dev)
 make seed-prod     # seed demo data inside the running Docker backend container
+make screenshots   # capture page screenshots via Puppeteer → docs/screenshots/
 make prod-build    # docker compose up -d --build (rebuild images)
 make prod          # docker compose up -d (start existing images)
 make prod-down     # docker compose down
