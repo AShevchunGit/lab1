@@ -42,7 +42,7 @@ interface Props {
 
 export function SpendingCharts({ transactions, month, year }: Props) {
   const expenses = useMemo(
-    () => transactions.filter(t => t.type === 'expense'),
+    () => transactions.filter(t => t.type === 'outcome'),
     [transactions]
   );
 

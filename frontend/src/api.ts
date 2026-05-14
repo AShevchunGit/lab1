@@ -19,7 +19,7 @@ export interface Transaction {
   id: number;
   title: string;
   amount: number;
-  type: 'expense' | 'income';
+  type: 'outcome' | 'income';
   date: string;
   notes: string | null;
   category_id: number | null;
@@ -43,13 +43,13 @@ export interface TransactionFilters {
   date_to?: string;
   amount_min?: string | number;
   amount_max?: string | number;
-  type?: 'expense' | 'income' | '';
+  type?: 'outcome' | 'income' | '';
 }
 
 export interface TransactionPayload {
   title: string;
   amount: number;
-  type: 'expense' | 'income';
+  type: 'outcome' | 'income';
   date: string;
   notes?: string;
   category_id?: number;

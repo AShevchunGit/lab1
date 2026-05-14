@@ -20,7 +20,7 @@ export function checkAndFireAlerts(
 
   const { total: spent } = db.prepare(
     `SELECT COALESCE(SUM(amount), 0) AS total FROM transactions
-     WHERE user_id = ? AND type = 'expense' AND strftime('%Y', date) = ? AND strftime('%m', date) = ?`
+     WHERE user_id = ? AND type = 'outcome' AND strftime('%Y', date) = ? AND strftime('%m', date) = ?`
   ).get(userId, String(year), String(month).padStart(2, '0')) as { total: number };
 
   const usagePct = (spent / budgetRow.budget) * 100;

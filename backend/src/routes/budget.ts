@@ -20,7 +20,7 @@ export function createBudgetRouter(db: Database.Database): Router {
 
     const { total: spent } = db.prepare(
       `SELECT COALESCE(SUM(amount), 0) AS total FROM transactions
-       WHERE user_id = ? AND type = 'expense'
+       WHERE user_id = ? AND type = 'outcome'
          AND strftime('%Y', date) = ? AND strftime('%m', date) = ?`
     ).get(userId, String(year), pad(month)) as { total: number };
 

@@ -71,11 +71,11 @@ const CardRow = styled.div`display: flex; justify-content: space-between; margin
 const CardLabel = styled.span`font-size: 12px; color: ${({ theme }) => theme.colors.textMuted};`;
 const CardValue = styled.span`font-size: 14px; font-weight: 500;`;
 const CardActions = styled.div`display: flex; gap: ${({ theme }) => theme.spacing.sm}; margin-top: ${({ theme }) => theme.spacing.sm};`;
-const Amount = styled.span<{ txtype?: 'expense' | 'income' }>`
+const Amount = styled.span<{ txtype?: 'outcome' | 'income' }>`
   font-weight: 600;
-  color: ${({ txtype }) => txtype === 'income' ? '#10B981' : txtype === 'expense' ? '#EF4444' : 'inherit'};
+  color: ${({ txtype }) => txtype === 'income' ? '#10B981' : txtype === 'outcome' ? '#EF4444' : 'inherit'};
 `;
-const TypeBadge = styled.span<{ txtype: 'expense' | 'income' }>`
+const TypeBadge = styled.span<{ txtype: 'outcome' | 'income' }>`
   display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600;
   background: ${({ txtype }) => txtype === 'income' ? '#D1FAE5' : '#FEE2E2'};
   color: ${({ txtype }) => txtype === 'income' ? '#065F46' : '#991B1B'};
@@ -105,10 +105,10 @@ const Textarea = styled.textarea`
 `;
 const ValidationMsg = styled.p`color: ${({ theme }) => theme.colors.danger}; font-size: 12px; margin-top: 4px;`;
 
-interface FormState { title: string; amount: string; type: 'expense' | 'income'; date: string; notes: string; category_id: string }
+interface FormState { title: string; amount: string; type: 'outcome' | 'income'; date: string; notes: string; category_id: string }
 interface FormErrors { title?: string; amount?: string; date?: string }
 
-const EMPTY_FORM: FormState = { title: '', amount: '', type: 'expense', date: '', notes: '', category_id: '' };
+const EMPTY_FORM: FormState = { title: '', amount: '', type: 'outcome', date: '', notes: '', category_id: '' };
 
 function validate(form: FormState): FormErrors {
   const errs: FormErrors = {};
@@ -208,7 +208,7 @@ export default function TransactionsPage() {
           <FilterInput type="number" placeholder="Max $" value={filters.amount_max as string} onChange={e => setFilter('amount_max', e.target.value)} style={{ width: 90 }} />
           <FilterSelect value={filters.type as string} onChange={e => setFilter('type', e.target.value)}>
             <option value="">All types</option>
-            <option value="expense">Expense</option>
+            <option value="outcome">Outcome</option>
             <option value="income">Income</option>
           </FilterSelect>
           <Button variant="ghost" size="sm" onClick={clearFilters}>Clear</Button>
@@ -254,7 +254,7 @@ export default function TransactionsPage() {
           footer={<><Button variant="secondary" onClick={() => { setShowCreate(false); setEditing(null); }}>Cancel</Button><Button onClick={() => void submit()} disabled={saving}>{editing ? 'Save' : 'Create'}</Button></>}>
           <ErrorBanner message={modalError} onDismiss={() => setModalError('')} />
           <FormGroup><Label>Title *</Label><Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} autoFocus />{formErrors.title && <ValidationMsg>{formErrors.title}</ValidationMsg>}</FormGroup>
-          <FormGroup><Label>Type *</Label><Select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as 'expense' | 'income' }))}><option value="expense">Expense</option><option value="income">Income</option></Select></FormGroup>
+          <FormGroup><Label>Type *</Label><Select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as 'outcome' | 'income' }))}><option value="outcome">Outcome</option><option value="income">Income</option></Select></FormGroup>
           <FormGroup><Label>Amount *</Label><Input type="number" min="0.01" step="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />{formErrors.amount && <ValidationMsg>{formErrors.amount}</ValidationMsg>}</FormGroup>
           <FormGroup><Label>Date *</Label><Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />{formErrors.date && <ValidationMsg>{formErrors.date}</ValidationMsg>}</FormGroup>
           <FormGroup><Label>Category</Label><Select value={form.category_id} onChange={e => setForm(f => ({ ...f, category_id: e.target.value }))}><option value="">None</option>{categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></FormGroup>

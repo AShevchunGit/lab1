@@ -57,7 +57,7 @@ console.log('Categories seeded for both users.');
 
 // ── Transaction data ──────────────────────────────────────────────────────────
 
-type TxDef = { title: string; amount: number; day: number; category: string; notes?: string; type?: 'expense' | 'income' };
+type TxDef = { title: string; amount: number; day: number; category: string; notes?: string; type?: 'outcome' | 'income' };
 
 // Monthly budgets — higher in holiday/summer months
 const monthlyBudgets: Record<number, number> = {
@@ -221,7 +221,7 @@ function seedYear(userId: number, categoryIds: Record<string, number>, label: st
     const txs = [...incomeTransactions(m), ...baseTransactions(m), ...monthSpecificTransactions(m)];
     for (const t of txs) {
       const date = `${demoYear}-${pad(m)}-${pad(t.day)}`;
-      insertTx.run(userId, categoryIds[t.category] ?? null, t.title, t.amount, t.type ?? 'expense', date, t.notes ?? null);
+      insertTx.run(userId, categoryIds[t.category] ?? null, t.title, t.amount, t.type ?? 'outcome', date, t.notes ?? null);
     }
     insertBudget.run(userId, demoYear, m, monthlyBudgets[m]);
     console.log(`  [${label}] ${demoYear}-${pad(m)}: ${txs.length} transactions, budget $${monthlyBudgets[m]}`);

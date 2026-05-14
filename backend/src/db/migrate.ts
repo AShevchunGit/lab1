@@ -10,6 +10,7 @@ interface Migration {
 const migrations: Migration[] = [
   require('./migrations/001_initial'),
   require('./migrations/002_transaction_type'),
+  require('./migrations/003_rename_expense_to_outcome'),
 ];
 
 function ensureMigrationsTable(db: import('better-sqlite3').Database): void {

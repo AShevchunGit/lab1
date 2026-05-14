@@ -7,7 +7,7 @@ import { checkAndFireAlerts } from '../websocket/alerts';
 interface UserRow { id: number }
 interface TransactionRow {
   id: number; user_id: number; category_id: number | null;
-  title: string; amount: number; type: 'expense' | 'income'; date: string; notes: string | null;
+  title: string; amount: number; type: 'outcome' | 'income'; date: string; notes: string | null;
 }
 
 export function createTransactionsRouter(db: Database.Database, getWss: () => WebSocketServer | null): Router {
@@ -33,7 +33,7 @@ export function createTransactionsRouter(db: Database.Database, getWss: () => We
     if (date_to) { sql += ' AND t.date <= ?'; params.push(date_to); }
     if (amount_min) { sql += ' AND t.amount >= ?'; params.push(Number(amount_min)); }
     if (amount_max) { sql += ' AND t.amount <= ?'; params.push(Number(amount_max)); }
-    if (type === 'expense' || type === 'income') { sql += ' AND t.type = ?'; params.push(type); }
+    if (type === 'outcome' || type === 'income') { sql += ' AND t.type = ?'; params.push(type); }
 
     sql += ' ORDER BY t.date DESC, t.created_at DESC';
     res.json(db.prepare(sql).all(...params));
@@ -44,14 +44,14 @@ export function createTransactionsRouter(db: Database.Database, getWss: () => We
     if (!title || !String(title).trim()) return void res.status(400).json({ error: 'Title is required' });
     if (!amount || Number(amount) <= 0) return void res.status(400).json({ error: 'Amount must be greater than 0' });
     if (!date) return void res.status(400).json({ error: 'Date is required' });
-    const txType = type === 'income' ? 'income' : 'expense';
+    const txType = type === 'income' ? 'income' : 'outcome';
 
     const row = db.prepare(`
       INSERT INTO transactions (user_id, category_id, title, amount, type, date, notes)
       VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *
     `).get((req.user as UserRow).id, category_id ?? null, String(title).trim(), Number(amount), txType, date, notes ?? null) as TransactionRow;
 
-    if (txType === 'expense') {
+    if (txType === 'outcome') {
       const d = new Date(String(date));
       checkAndFireAlerts(db, getWss(), (req.user as UserRow).id, d.getFullYear(), d.getMonth() + 1);
     }
@@ -66,7 +66,7 @@ export function createTransactionsRouter(db: Database.Database, getWss: () => We
     const { title, amount, date, notes, category_id, type } = req.body as Record<string, string | number | undefined>;
     if (title !== undefined && !String(title).trim()) return void res.status(400).json({ error: 'Title is required' });
     if (amount !== undefined && Number(amount) <= 0) return void res.status(400).json({ error: 'Amount must be greater than 0' });
-    if (type !== undefined && type !== 'expense' && type !== 'income') return void res.status(400).json({ error: 'Type must be expense or income' });
+    if (type !== undefined && type !== 'outcome' && type !== 'income') return void res.status(400).json({ error: 'Type must be outcome or income' });
 
     const updated = db.prepare(`
       UPDATE transactions
