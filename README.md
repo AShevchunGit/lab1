@@ -84,6 +84,7 @@ Browser → nginx (:80)
 | `make prod-build` | Build images and start all services in the background |
 | `make prod` | Start existing images (no rebuild) |
 | `make prod-down` | Stop and remove containers |
+| `make seed-prod` | Seed demo data inside the running Docker backend container |
 
 ### Configuration
 
@@ -212,6 +213,7 @@ On success the user is redirected to the frontend root. On failure they are redi
 - `category_id` — filter by category
 - `date_from` / `date_to` — ISO date range (YYYY-MM-DD)
 - `amount_min` / `amount_max` — amount range
+- `type` — `outcome` or `income`
 
 ---
 
@@ -237,7 +239,7 @@ The WebSocket connection is authenticated by reading the express-session cookie 
 
 ## Budget Alert Logic
 
-Alerts are checked after every transaction create, update, or delete for the affected user and month.
+Alerts are checked after every transaction create, update, or delete for the affected user and month. Only `outcome` transactions count toward the budget; `income` transactions are excluded.
 
 **Thresholds:** 50%, 80%, 100% of the monthly budget.
 

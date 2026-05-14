@@ -16,7 +16,8 @@ make lint          # ESLint for both
 make test          # backend Jest tests (only backend has tests)
 make migrate       # run pending DB migrations
 make revert        # revert the last migration
-make seed          # seed demo data + local admin user
+make seed          # seed demo data + local admin user (local dev)
+make seed-prod     # seed demo data inside the running Docker backend container
 make prod-build    # docker compose up -d --build (rebuild images)
 make prod          # docker compose up -d (start existing images)
 make prod-down     # docker compose down
@@ -40,7 +41,7 @@ Express + TypeScript, SQLite via `better-sqlite3` (synchronous API — no `await
 
 **Startup flow:** `index.ts` → creates DB singleton (`db/connection.ts`), runs `initSchema` (idempotent `CREATE TABLE IF NOT EXISTS`), mounts routers, then calls `initWebSocket`.
 
-**Router factory pattern:** every route file exports a `create*Router(db)` function that takes the DB instance. `createTransactionsRouter` also takes a `wss` reference (or null in tests) to trigger budget alert checks after mutations.
+**Router factory pattern:** every route file exports a `create*Router(db)` function that takes the DB instance. `createTransactionsRouter` also takes a `wss` reference (or null in tests) to trigger budget alert checks after mutations. Transaction `type` values are `'outcome'` (default) and `'income'`.
 
 **Auth:** Passport.js with Google and GitHub strategies (only registered if the corresponding env vars are set). Local hardcoded users are enabled by `LOCAL_AUTH_ENABLED=true`; credentials come from `LOCAL_USERS=user:pass,user2:pass2`. All three providers upsert into the `users` table with a `(provider, provider_id)` unique key.
 
